@@ -23,10 +23,8 @@ def login_view(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            # После успешной аутентификации перенаправьте пользователя на другую страницу
-            return redirect('/')
+            return redirect('index')
         else:
-            # Если аутентификация не удалась, можно добавить обработку ошибки
             return render(request, 'registration/login.html', {'error': 'Invalid username or password'})
 
     return render(request, 'registration/login.html')
@@ -45,7 +43,7 @@ def register(request):
                 # Логин пользователя
                 user = authenticate(username=username, password=password)
                 login(request, user)
-                return redirect('/')  # замените 'home' на URL вашей главной страницы
+                return redirect('index')
             else:
                 # Вывод ошибки, если имя пользователя уже используется
                 return render(request, 'registration/register.html', {'form': form, 'error_message': 'Username already exists'})
@@ -64,7 +62,7 @@ def add_quote(request):
         form = QuoteForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('index')  # Перенаправьте на главную страницу или другую страницу
+            return redirect('index')
     else:
         form = QuoteForm()
     return render(request, 'index/add_quote.html', {'form': form})
@@ -75,7 +73,7 @@ def add_author(request):
         form = AuthorForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('index')  # Перенаправьте на главную страницу или другую страницу
+            return redirect('authors')
     else:
         form = AuthorForm()
     return render(request, 'authors/add_author.html', {'form': form})
