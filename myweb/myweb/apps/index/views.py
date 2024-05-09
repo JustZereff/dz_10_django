@@ -7,7 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
 from .forms import RegistrationForm, QuoteForm, AuthorForm
 from django.views.generic.base import View
-from .models import Author, Quote
+from .models import Author, Quote, Tag
 
 def index(request):
     quote_list = Quote.objects.order_by('author')
@@ -61,7 +61,17 @@ def add_quote(request):
     if request.method == 'POST':
         form = QuoteForm(request.POST)
         if form.is_valid():
-            form.save()
+            quote_text = form.cleaned_data['quote']
+            author = form.cleaned_data['author']
+            tag_custom = form.cleaned_data['tag_custom']
+            tags_input = tag_custom.split(',')
+            tags_input = [tag.strip() for tag in tags_input if tag.strip()]
+            # Создаем список объектов Tag для каждого тега
+            tag_objects = [Tag.objects.get_or_create(tag=tag)[0] for tag in tags_input]
+            new_quote = Quote.objects.create(quote=quote_text, author=author)
+            # Привязываем теги к цитате
+            new_quote.tag.add(*tag_objects)
+
             return redirect('index')
     else:
         form = QuoteForm()

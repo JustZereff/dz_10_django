@@ -17,7 +17,16 @@
                             <p> <strong>Quote: </strong> <em>{{ quote.quote }} </em> </p>
                         </div>
                         <div class="my_tag_container"> 
-                            <p> <strong>Tags: </strong><u>{{ quote.tag }}</u></p>
+                            <p> <strong>Tags: </strong>
+                                {% if quote.tag.all %}
+                                    {% for tag in quote.tag.all %}
+                                        {{ tag }}
+                                        {% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                {% else %}
+                                    No tags associated with this quote.
+                                {% endif %}
+                            </p>
                         </div>
                     </div>
                 </div>

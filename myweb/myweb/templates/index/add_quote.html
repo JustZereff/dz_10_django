@@ -10,7 +10,7 @@
         <div class="col-md-6">
             <div class="col-md-12">
                 <h3 class="row justify-content-center align-items-center">Add Quote</h3>
-                <a class="row justify-content-center align-items-center" href=' {% url "add_author" %} '>To add a quote you must add the author</a>
+                <a class="row justify-content-center align-items-center" href='{% url "add_author" %}'>To add a quote you must add the author</a>
                     <form method="post">
                         {% csrf_token %}
                         
@@ -26,7 +26,11 @@
                             {{ form.tag.label_tag }}
                             {{ form.tag }}
                         </div>
-                        <button type="submit">Submit</button>
+                        <div class="form-group">
+                            <label for="{{ form.tag_custom.id_for_label }}">Custom Tag</label>
+                            {{ form.tag_custom }}
+                        </div>
+                        <button type="submit">Create</button>
                     </form>
             </div>
         </div>
