@@ -2,10 +2,11 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect
-from .forms import RegistrationForm, QuoteForm, AuthorForm
+from django.contrib.auth.forms import PasswordChangeForm
+from .forms import RegistrationForm, QuoteForm, AuthorForm, UserForm, UserProfileForm, CustomPasswordChangeForm
 from django.views.generic.base import View
 from .models import Author, Quote, Tag
 
@@ -91,3 +92,26 @@ def add_author(request):
 def author_detail(request, author_id):
     author = get_object_or_404(Author, pk=author_id)
     return render(request, 'authors/author_detail.html', {'author': author})
+
+@login_required
+def user_settings(request):
+    user = request.user
+    user_form = UserForm(instance=user)
+    profile = user.userprofile
+    profile_form = UserProfileForm(instance=profile)
+    password_form = CustomPasswordChangeForm(user)
+
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=user)
+        profile_form = UserProfileForm(request.POST, instance=profile)
+        password_form = CustomPasswordChangeForm(user, request.POST)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            return redirect('user_settings')
+        if password_form.is_valid():
+            user = password_form.save()
+            update_session_auth_hash(request, user)  # Important!
+            return redirect('user_settings')
+
+    return render(request, 'user/user_settings.html', {'user_form': user_form, 'profile_form': profile_form, 'password_form': password_form})
